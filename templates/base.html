@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI College Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+          
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">🎓 AI College Assistant</div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+
+        {% if session.get("user_id") %}
+            <a href="/dashboard">Dashboard</a>
+            <a href="{{ url_for('chatbot') }}">AI Chatbot</a>
+            <a href="/notices">Notices</a>
+
+            {% if session.get("role") == "admin" %}
+                <a href="/admin-login">Admin</a>
+            {% endif %}
+
+            <a href="/logout">Logout</a>
+
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </div>
+</nav>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

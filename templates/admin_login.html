@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="admin-login-box">
+
+        <h1>👨‍💼 Admin Login</h1>
+
+        <p>AI College Chatbots</p>
+
+        <form method="POST">
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Admin Email"
+                required
+            >
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Admin Password"
+                required
+            >
+
+            <button type="submit" class="btn">
+                🔐 Login as Admin
+            </button>
+
+        </form>
+
+        <br>
+
+        <a href="/login">← Student Login</a>
+
+    </div>
+
+</div>
+
+{% endblock %}

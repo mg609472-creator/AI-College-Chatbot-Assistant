@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>👨‍💼 Admin Dashboard</h1>
+
+    <p>Welcome to the AI College Chatbot Admin Panel.</p>
+
+    <!-- Dashboard Cards -->
+    <div class="dashboard-cards">
+
+        <div class="card">
+            <h2>👨‍🎓</h2>
+            <h3>Students</h3>
+           <p>Total Students</p>
+           <strong>{{ total_students }}</strong>
+        </div>
+
+        <div class="card">
+            <h2>📢</h2>
+            <h3>Notices</h3>
+            <p>Total Notices</p>
+            <strong>{{ total_notices }}</strong>
+        </div>
+
+        <div class="card">
+            <h2>📅</h2>
+            <h3>Attendance</h3>
+            <p>Attendance Records</p>
+            <strong>{{ total_attendance }}</strong>
+        </div>
+
+        <div class="card">
+            <h2>🤖</h2>
+            <h3>AI Chatbot</h3>
+            <p>View AI College Chatbot</p>
+        </div>
+
+    </div>
+
+
+    <!-- Admin Actions -->
+
+    <div class="admin-actions">
+
+        <h2>⚙️ Admin Actions</h2>
+
+        <a href="/notices" class="admin-btn">
+            📢 Manage Notices
+        </a>
+
+        <a href="/attendance" class="admin-btn">
+            📅 Manage Attendance
+        </a>
+
+        <a href="/chatbot" class="admin-btn">
+            🤖 Open AI Chatbot
+        </a>
+
+        <a href="/dashboard" class="admin-btn">
+            🎓 Student Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- Add Notice -->
+
+    <div class="admin-form">
+
+        <h2>➕ Add College Notice</h2>
+
+        <form method="POST">
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Notice Title"
+                required
+            >
+
+            <textarea
+                name="content"
+                placeholder="Notice Details"
+                rows="5"
+                required
+            ></textarea>
+
+            <button type="submit">
+                📢 Add Notice
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

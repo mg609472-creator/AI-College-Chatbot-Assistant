@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="quiz-container">
+
+    <h1>📝 AI Quiz Generator</h1>
+
+    <p class="quiz-subtitle">
+        Generate an AI-powered quiz and test your knowledge 🤖📚
+    </p>
+
+    <div class="quiz-form" id="quiz-form">
+
+        <h2>🎯 Create Your Quiz</h2>
+
+        <input
+            type="text"
+            id="subject"
+            placeholder="Enter subject (e.g. Python)"
+        >
+
+        <input
+            type="text"
+            id="topic"
+            placeholder="Enter topic (e.g. Loops)"
+        >
+
+        <select id="difficulty">
+            <option value="">Select Difficulty</option>
+            <option value="Easy">🟢 Easy</option>
+            <option value="Medium">🟡 Medium</option>
+            <option value="Hard">🔴 Hard</option>
+        </select>
+
+        <button class="btn" onclick="generateQuiz()">
+            Generate Quiz 🤖
+        </button>
+
+    </div>
+
+    <div id="quiz-result"></div>
+
+</div>
+
+
+<script>
+
+let quizQuestions = [];
+let currentQuestion = 0;
+let userAnswers = [];
+
+
+async function generateQuiz() {
+
+    const subject =
+        document.getElementById("subject").value.trim();
+
+    const topic =
+        document.getElementById("topic").value.trim();
+
+    const difficulty =
+        document.getElementById("difficulty").value;
+
+    if (!subject || !topic || !difficulty) {
+
+        alert("Please fill all fields!");
+        return;
+    }
+
+    const result =
+        document.getElementById("quiz-result");
+
+    result.innerHTML = `
+        <div class="loading">
+            🤖 AI is generating your quiz...
+        </div>
+    `;
+
+    try {
+
+        const response = await fetch("/generate-quiz", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                subject: subject,
+                topic: topic,
+                difficulty: difficulty
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.questions) {
+
+            quizQuestions = data.questions;
+            currentQuestion = 0;
+            userAnswers = [];
+
+            document.getElementById("quiz-form").style.display = "none";
+
+            showQuestion();
+
+        } else {
+
+            result.innerHTML = `
+                <p>⚠️ ${data.error || "Quiz could not be generated."}</p>
+            `;
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        result.innerHTML = `
+            <p>⚠️ Something went wrong. Please try again.</p>
+        `;
+    }
+}
+
+
+function showQuestion() {
+
+    const question =
+        quizQuestions[currentQuestion];
+
+    const result =
+        document.getElementById("quiz-result");
+
+    let optionsHTML = "";
+
+    question.options.forEach((option, index) => {
+
+        optionsHTML += `
+            <label class="quiz-option">
+
+                <input
+                    type="radio"
+                    name="answer"
+                    value="${option}"
+                >
+
+                <span>${option}</span>
+
+            </label>
+        `;
+    });
+
+
+    let buttonText =
+        currentQuestion === quizQuestions.length - 1
+        ? "🏆 Submit Quiz"
+        : "➡️ Next";
+
+
+    result.innerHTML = `
+
+        <div class="quiz-output">
+
+            <div class="quiz-progress">
+                Question ${currentQuestion + 1}
+                of ${quizQuestions.length}
+            </div>
+
+            <h2>
+                Q${currentQuestion + 1}.
+                ${question.question}
+            </h2>
+
+            <div class="options">
+                ${optionsHTML}
+            </div>
+
+            <button
+                class="btn"
+                onclick="nextQuestion()">
+                ${buttonText}
+            </button>
+
+        </div>
+    `;
+}
+
+
+function nextQuestion() {
+
+    const selected =
+        document.querySelector(
+            'input[name="answer"]:checked'
+        );
+
+    if (!selected) {
+
+        alert("Please select an answer first! ☑️");
+        return;
+    }
+
+
+    userAnswers[currentQuestion] =
+        selected.value;
+
+
+    if (currentQuestion <
+        quizQuestions.length - 1) {
+
+        currentQuestion++;
+
+        showQuestion();
+
+    } else {
+
+        submitQuiz();
+    }
+}
+
+
+function submitQuiz() {
+
+    let score = 0;
+
+    quizQuestions.forEach((question, index) => {
+
+        if (
+            userAnswers[index] ===
+            question.answer
+        ) {
+
+            score++;
+        }
+    });
+
+
+    const total =
+        quizQuestions.length;
+
+    const percentage =
+        Math.round((score / total) * 100);
+
+
+    let message = "";
+
+    if (percentage >= 80) {
+        message = "🎉 Excellent Performance!";
+    }
+    else if (percentage >= 60) {
+        message = "👏 Good Job!";
+    }
+    else if (percentage >= 40) {
+        message = "👍 Keep Practicing!";
+    }
+    else {
+        message = "📚 Need More Practice!";
+    }
+
+
+    document.getElementById("quiz-result").innerHTML = `
+
+        <div class="quiz-score">
+
+            <h2>🏆 Quiz Completed!</h2>
+
+            <div class="score-circle">
+                ${score}/${total}
+            </div>
+
+            <h3>
+                Score: ${score} / ${total}
+            </h3>
+
+            <h3>
+                Percentage: ${percentage}%
+            </h3>
+
+            <p>${message}</p>
+
+            <button
+                class="btn"
+                onclick="tryAgain()">
+                🔄 Try Again
+            </button>
+
+        </div>
+
+    `;
+}
+
+
+function tryAgain() {
+
+    quizQuestions = [];
+    currentQuestion = 0;
+    userAnswers = [];
+
+    document.getElementById("quiz-form").style.display = "block";
+
+    document.getElementById("quiz-result").innerHTML = "";
+
+}
+
+</script>
+
+{% endblock %}

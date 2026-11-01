@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>Welcome, {{ name }} 👋</h1>
+
+    <div class="dashboard-grid">
+
+        <div class="card">
+            <h2>🤖 AI Assistant</h2>
+            <p>Ask questions about your college.</p>
+            <a class="btn" href="/chatbot">Open Chatbot</a>
+        </div>
+
+        <div class="card">
+            <h2>📢 Notices</h2>
+            <p>Check the latest college announcements.</p>
+            <a class="btn" href="/notices">View Notices</a>
+        </div>
+
+        <div class="card">
+    <h2>📚 Study Planner</h2>
+    <p>Plan your study time effectively.</p>
+    <a class="btn" href="/study-planner">Open Planner</a>
+</div>
+<div class="card">
+    <h2>📝 AI Quiz Generator</h2>
+    <p>Generate AI-powered quizzes for your exam preparation.</p>
+    <a class="btn" href="/quiz">Start Quiz 🤖</a>
+</div>
+<div class="card">
+    <h2>📊 My Attendance</h2>
+    <p>Check your attendance records.</p>
+    <a class="btn" href="/my-attendance">View Attendance</a>
+</div>
+  
+</div>
+
+    <h2>📢 Recent Notices</h2>
+
+    {% for notice in notices %}
+
+        <div class="notice">
+            <h3>{{ notice["title"] }}</h3>
+            <p>{{ notice["content"] }}</p>
+        </div>
+
+    {% else %}
+
+        <p>No notices available.</p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

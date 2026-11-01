@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>🎓 AI College Assistant</h1>
+
+    <p>
+        Welcome to your AI-powered college
+        assistance and automation system.
+    </p>
+
+    <a href="{{ url_for('chatbot') }}" class="btn">
+    Get Started 🚀
+</a>
+
+</section>
+
+<section id="chatbot" class="chatbot">
+
+    <h2>🤖 AI College Assistant</h2>
+    <button onclick="clearChat()" class="clear-btn">🧹 Clear Chat</button>
+    <p>Ask your college-related question:</p>
+
+    <div id="chat-box">
+        <div class="message bot">
+            👋 Hello! I'm your AI College Assistant.
+            How can I help you?
+        </div>
+    </div>
+
+    <textarea id="question"
+        placeholder="Type your question here..."></textarea>
+        <div class="suggestions">
+
+    <button onclick="askSuggestion('What is BCA?')">
+        📚 What is BCA?
+    </button>
+
+    <button onclick="askSuggestion('What is Artificial Intelligence?')">
+        🤖 What is AI?
+    </button>
+
+    <button onclick="askSuggestion('Explain Python programming')">
+        💻 Explain Python
+    </button>
+
+    <button onclick="askSuggestion('What is Data Science?')">
+        📊 What is Data Science?
+    </button>
+
+</div>
+
+    <button onclick="askAI()" class="btn">
+        Ask AI
+    </button>
+
+</section>
+
+<section class="features">
+
+    <div class="card">
+        <h2>🤖 AI Chatbot</h2>
+        <p>Ask questions about your college, courses and exams.</p>
+    </div>
+
+    <div class="card">
+        <h2>📢 Notices</h2>
+        <p>View important college announcements.</p>
+    </div>
+
+    <div class="card">
+        <h2>📚 Study Planner</h2>
+        <p>Plan your studies and manage your time.</p>
+    </div>
+
+    <div class="card">
+        <h2>📊 Performance</h2>
+        <p>Keep track of your academic progress.</p>
+    </div>
+
+</section>
+<script>
+function askSuggestion(text) {
+    document.getElementById("question").value = text;
+}
+
+async function askAI() {
+
+    const questionBox = document.getElementById("question");
+    const chatBox = document.getElementById("chat-box");
+
+    const question = questionBox.value.trim();
+
+    if (!question) {
+        alert("Pehle question likho!");
+        return;
+    }
+
+    chatBox.innerHTML += `
+        <div class="message user">${question}</div>
+    `;
+
+    questionBox.value = "";
+
+    chatBox.innerHTML += `
+        <div id="loading" class="message bot">
+            🤖 AI is thinking...
+        </div>
+    `;
+
+    try {
+
+        const response = await fetch("/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                question: question
+            })
+        });
+
+        const data = await response.json();
+
+        document.getElementById("loading").remove();
+
+        chatBox.innerHTML += `
+            <div class="message bot">
+                🤖 ${data.response || data.error}
+            </div>
+        `;
+
+    } catch (error) {
+
+        document.getElementById("loading").remove();
+
+        chatBox.innerHTML += `
+            <div class="message bot">
+                ⚠️ Unable to connect to AI.
+            </div>
+        `;
+    }
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function clearChat() {
+
+    document.getElementById("chat-box").innerHTML = `
+        <div class="message bot">
+            👋 Hello! I'm your AI College Assistant.
+            How can I help you?
+        </div>
+    `;
+}
+</script>
+
+{% endblock %}

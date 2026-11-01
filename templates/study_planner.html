@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="planner-container">
+
+    <h1>📚 Study Planner</h1>
+    <div class="planner-stats">
+
+    <div class="stat-card">
+        <h3>📚 Total Tasks</h3>
+        <span id="total-tasks">0</span>
+    </div>
+
+    <div class="stat-card">
+        <h3>✅ Completed</h3>
+        <span id="completed-tasks">0</span>
+    </div>
+
+    <div class="stat-card">
+        <h3>⏰ Study Hours</h3>
+        <span id="total-hours">0</span>
+    </div>
+
+</div>
+    <p class="planner-subtitle">
+        Organize your studies and stay on track 🎯
+    </p>
+
+    <div class="planner-form">
+
+        <h2>➕ Add Study Task</h2>
+
+        <input type="text" id="subject" placeholder="Enter subject">
+
+        <input type="text" id="topic" placeholder="Enter topic">
+
+        <input type="date" id="study-date">
+
+        <input type="number" id="hours" placeholder="Study hours" min="1">
+
+        <select id="priority">
+            <option value="">Select Priority</option>
+            <option value="High">🔴 High</option>
+            <option value="Medium">🟡 Medium</option>
+            <option value="Low">🟢 Low</option>
+        </select>
+
+        <button class="btn" onclick="addTask()">
+            Add Task ➕
+        </button>
+
+    </div>
+
+    <div class="tasks-section">
+
+        <h2>📝 My Study Tasks</h2>
+
+        <div id="task-list">
+            <p class="empty-message">
+                No study tasks added yet.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="progress-section">
+
+        <h2>📊 Study Progress</h2>
+
+        <div class="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
+
+        <p id="progress-text">0% Completed</p>
+
+    </div>
+
+</div>
+
+<script>
+
+let tasks = [];
+
+function addTask() {
+
+    const subject = document.getElementById("subject").value.trim();
+    const topic = document.getElementById("topic").value.trim();
+    const date = document.getElementById("study-date").value;
+    const hours = document.getElementById("hours").value;
+    const priority = document.getElementById("priority").value;
+
+    if (!subject || !topic || !date || !hours || !priority) {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    tasks.push({
+        subject: subject,
+        topic: topic,
+        date: date,
+        hours: hours,
+        priority: priority,
+        completed: false
+    });
+
+    document.getElementById("subject").value = "";
+    document.getElementById("topic").value = "";
+    document.getElementById("study-date").value = "";
+    document.getElementById("hours").value = "";
+    document.getElementById("priority").value = "";
+
+    displayTasks();
+}
+
+function displayTasks() {
+
+    const taskList = document.getElementById("task-list");
+
+    taskList.innerHTML = "";
+
+    if (tasks.length === 0) {
+
+        taskList.innerHTML = `
+            <p class="empty-message">
+                No study tasks added yet.
+            </p>
+        `;
+
+        updateProgress();
+        return;
+    }
+
+    tasks.forEach((task, index) => {
+
+        taskList.innerHTML += `
+            <div class="study-task ${task.completed ? 'completed' : ''}">
+
+                <div>
+                    <h3>📚 ${task.subject}</h3>
+                    <p>📖 ${task.topic}</p>
+                    <p>📅 ${task.date} | ⏰ ${task.hours} hour(s)</p>
+                    <p>Priority: <strong>${task.priority}</strong></p>
+                </div>
+
+                <div class="task-buttons">
+
+                    <button onclick="completeTask(${index})">
+                        ${task.completed ? "↩️ Undo" : "✅ Complete"}
+                    </button>
+
+                    <button onclick="deleteTask(${index})">
+                        🗑️ Delete
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    });
+
+    updateProgress();
+}
+
+function completeTask(index) {
+
+    tasks[index].completed = !tasks[index].completed;
+
+    displayTasks();
+}
+function deleteTask(index) {
+
+    tasks.splice(index, 1);
+
+    displayTasks();
+}
+
+function updateProgress() {
+
+    document.getElementById("total-tasks").innerText = tasks.length;
+
+    document.getElementById("completed-tasks").innerText =
+        tasks.filter(task => task.completed).length;
+
+    document.getElementById("total-hours").innerText =
+        tasks.reduce((total, task) => total + Number(task.hours), 0);
+
+    const progressFill = document.getElementById("progress-fill");
+    const progressText = document.getElementById("progress-text");
+
+    if (tasks.length === 0) {
+        progressFill.style.width = "0%";
+        progressText.innerText = "0% Completed";
+        return;
+    }
+
+    const completedTasks =
+        tasks.filter(task => task.completed).length;
+
+    const percentage =
+        Math.round((completedTasks / tasks.length) * 100);
+
+    progressFill.style.width = percentage + "%";
+    progressText.innerText = percentage + "% Completed";
+}
+</script>
+
+{% endblock %}

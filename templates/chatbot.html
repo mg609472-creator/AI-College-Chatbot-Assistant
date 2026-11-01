@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="chatbot">
+
+    <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
+
+    <h2>🤖 AI College Assistant</h2>
+
+    <p>
+        Ask me anything about BCA, exams, Python, assignments,
+        attendance, fees and college-related topics.
+    </p>
+    <div class="help-section">
+    <h3>💡 How to Ask Questions</h3>
+    <p>Ask me anything about your college, courses, exams and studies.</p>
+
+    <div class="question-cards">
+        <button onclick="askSuggestion('What are the admission requirements?')">
+            🏫 College
+        </button>
+
+        <button onclick="askSuggestion('What subjects are taught in BCA?')">
+            📚 Courses
+        </button>
+
+        <button onclick="askSuggestion('What are the important topics for my exam?')">
+            📝 Exams
+        </button>
+
+        <button onclick="askSuggestion('Suggest a BCA project using Python.')">
+            💻 Projects
+        </button>
+
+        <button onclick="askSuggestion('Explain the attendance requirements.')">
+            📅 Attendance
+        </button>
+    </div>
+</div>
+
+    <div id="chat-box">
+
+        <div class="message bot">
+            Hello! 👋 I am your AI College Assistant.
+            Ask me about BCA, exams, fees, Python, assignments or attendance.
+        </div>
+
+    </div>
+
+    <div class="suggestions">
+
+        <button onclick="askSuggestion('Tell me about BCA')">
+            📚 BCA
+        </button>
+
+        <button onclick="askSuggestion('Give me Python exam questions')">
+            🐍 Python
+        </button>
+
+        <button onclick="askSuggestion('What are important exam topics?')">
+            📝 Exams
+        </button>
+
+        <button onclick="askSuggestion('Explain attendance rules')">
+            📅 Attendance
+        </button>
+
+    </div>
+
+    <textarea
+        id="question"
+        placeholder="Ask your question..."
+        onkeypress="handleEnter(event)"
+    ></textarea>
+
+    <button class="btn" onclick="sendMessage()">
+        Send 🚀
+    </button>
+
+</div>
+
+<script>
+async function sendMessage() {
+
+    const input = document.getElementById("question");
+    const chatBox = document.getElementById("chat-box");
+
+    const message = input.value.trim();
+
+    if (!message) {
+        alert("Please enter your question!");
+        return;
+    }
+
+    chatBox.innerHTML += `
+        <div class="message user">
+            ${message}
+        </div>
+    `;
+
+    input.value = "";
+
+    chatBox.innerHTML += `
+        <div id="loading" class="message bot">
+            🤖 AI is thinking...
+        </div>
+    `;
+
+    try {
+
+        const response = await fetch("/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                question: message
+            })
+        });
+
+        const data = await response.json();
+
+        document.getElementById("loading").remove();
+
+        chatBox.innerHTML += `
+            <div class="message bot">
+                🤖 ${data.response || data.error}
+            </div>
+        `;
+
+    } catch (error) {
+
+        document.getElementById("loading").remove();
+
+        chatBox.innerHTML += `
+            <div class="message bot">
+                ⚠️ Unable to connect to AI.
+            </div>
+        `;
+    }
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
+function askSuggestion(question) {
+    const input = document.getElementById("question");
+    input.value = question;
+    sendMessage();
+}
+
+
+function handleEnter(event) {
+
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+
+function clearChat() {
+
+    document.getElementById("chat-box").innerHTML = `
+        <div class="message bot">
+            Hello! 👋 I am your AI College Assistant.
+            Ask me about BCA, exams, fees, Python, assignments or attendance.
+        </div>
+    `;
+}
+</script>
+
+{% endblock %}
