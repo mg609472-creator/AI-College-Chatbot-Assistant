@@ -14,7 +14,7 @@ client = OpenAI(
 
 app = Flask(__name__)
 
-app.secret_key = "college-assistant-secret-key"
+app.secret_key =os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
 
 # Initialize database
 init_db()
